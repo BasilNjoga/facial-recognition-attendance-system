@@ -1,0 +1,23 @@
+body {
+    height: 700px;
+    color: red;
+}
+h1 {
+    font-family: sans-serif;
+    color: #333;
+}
+#container {
+	margin: 0px auto;
+	width: 520px;
+	height: 395px;
+	border: 10px #333 solid;
+}
+#videoElement 
+{
+	width: 500px;
+	height: 375px;
+	background-color: #666;
+}
+#buttonControl {
+	margin: 15px 10px 10px 550px;
+}

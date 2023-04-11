@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %} Facial Recognition Attendance System {% endblock %}
+{% block mycss %} 
+{% endblock %}
+{% block content %}
+<h1>Facial Recognition System </h1>
+<h1>Display Webcam Stream</h1>
+<div id="container">
+	<video autoplay="true" id="videoElement">
+	
+	</video>
+</div>
+<div id="buttonControl">
+<button onclick = "stop()" > Stop Camera </button>
+<button onclick = "showcam()" > Start Camera </button>
+</div>
+    <script>
+var video = document.querySelector("#videoElement");
+
+function showcam() {
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+      video.srcObject = stream;
+    })
+    .catch(function (err0r) {
+      console.log("Something went wrong!");
+    });
+}
+}
+showcam();
+function stop(e) {
+    var stream = video.srcObject;
+    var tracks = stream.getTracks();
+
+    for (var i = 0; i < tracks.length; i++) {
+        var track = tracks[i];
+        track.stop();
+    }
+
+    video.srcObject = null;
+}
+    </script>
+{% endblock %}
