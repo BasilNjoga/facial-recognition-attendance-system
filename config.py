@@ -1,7 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_wtf import FlaskForm
-from wtfforms import StringField, SubmitField
-from flask import render_template
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Add Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/facialrecognition'
 # Secret Key !
-app.config['SECRET_KEY'] = "my super secret key"
+app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
 app.app_context().push()
 db = SQLAlchemy(app)
@@ -25,10 +25,28 @@ class Myusers(db.Model):
     #create A string
     def __repr__(self):
         return '<Name %r>' % self.name
+# Create a Form Class
+class NamerForm(FlaskForm):
+    name = StringField("What's Your Name", validators=[DataRequired()])
+    submit = SubmitField("Submit")
 
+#Create home page
 @app.route("/")
 def home():
     return render_template('index.html')
+
+#Create name page
+@app.route("/name", methods=['GET', 'POST'])
+def name():
+    name = None
+    form = NamerForm()
+    #Validate Form
+    if form.validate_on_submit():
+        name = form.name.data
+        form.name.data = ''
+    return render_template('name.html',
+        name = name,
+        form = form)
 
 
 
