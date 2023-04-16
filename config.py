@@ -12,11 +12,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 # Secret Key !
 app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
-app.app_context().push()
 db = SQLAlchemy(app)
 
 #Create Model
-class Myusers(db.Model):
+class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
