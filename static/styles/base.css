@@ -1,6 +1,8 @@
 body {
-    height: 700px;
-    color: red;
+    padding: 0px;
+}
+#content {
+	padding: 30px;
 }
 h1 {
     font-family: sans-serif;

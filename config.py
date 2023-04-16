@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -8,7 +8,7 @@ from datetime import datetime
 # Create a Flask Instance
 app = Flask(__name__)
 # Add Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/facialrecognition'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 # Secret Key !
 app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
@@ -23,12 +23,21 @@ class Myusers(db.Model):
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
     #create A string
-    def __repr__(self):
+    def __repr__(self): 
         return '<Name %r>' % self.name
+
 # Create a Form Class
+class UserForm(FlaskForm):
+    name = StringField("Name:", validators=[DataRequired()])
+    email = StringField("Email:", validators=[DataRequired()])
+    
+    submit = SubmitField("Log in")
 class NamerForm(FlaskForm):
-    name = StringField("What's Your Name", validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    name = StringField("Name:", validators=[DataRequired()])
+    email = StringField("Email:", validators=[DataRequired()])
+    
+    submit = SubmitField("Log in")
+
 
 #Create home page
 @app.route("/")
@@ -39,6 +48,7 @@ def home():
 @app.route("/name", methods=['GET', 'POST'])
 def name():
     name = None
+    email = None
     form = NamerForm()
     #Validate Form
     if form.validate_on_submit():
@@ -48,7 +58,11 @@ def name():
         name = name,
         form = form)
 
-
+@app.route('/add_user', methods=['GET', 'POST'])
+def add_user():
+    name = None
+    form = UserForm()
+    return render_template("add_user.html", form = form)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=80)
