@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
@@ -8,7 +8,7 @@ from datetime import datetime
 # Create a Flask Instance
 app = Flask(__name__)
 # Add Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/facialrecognition'
 # Secret Key !
 app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
@@ -30,7 +30,7 @@ class UserForm(FlaskForm):
     name = StringField("Name:", validators=[DataRequired()])
     email = StringField("Email:", validators=[DataRequired()])
     
-    submit = SubmitField("Log in")
+    submit = SubmitField("Add User")
 class NamerForm(FlaskForm):
     name = StringField("Name:", validators=[DataRequired()])
     email = StringField("Email:", validators=[DataRequired()])
@@ -53,6 +53,8 @@ def name():
     if form.validate_on_submit():
         name = form.name.data
         form.name.data = ''
+        flash("Form Submitted Successfuly")
+
     return render_template('name.html',
         name = name,
         form = form)
@@ -70,6 +72,7 @@ def add_user():
         name = form.name.data
         form.name.data = ''
         form.email.data = ''
+        flash(" has been added")
     our_users = Users.query.order_by(Users.date_added)
     return render_template("add_user.html",
         form = form,

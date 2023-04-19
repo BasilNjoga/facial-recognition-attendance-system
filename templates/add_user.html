@@ -4,14 +4,25 @@
 
 {% if name %}
     <h1> User Added ! </h1>
+    {% for message in get_flashed_messages()  %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+       {{name }} {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
     <br/> <br/> <br/>
-    {% for our_user in our_users %}
-    {{our_user.id }}. {{ our_user.name 
-        }} - {{ our_user.email }} <br/>
-{% endfor %}
+    <table class="table table-striped table-hover table-bordered">
+        {% for our_user in our_users %}
+        <tr>
+           <td>{{our_user.id }}. {{ our_user.name 
+        }} - {{ our_user.email }} </td>
+        </tr>
+        {% endfor %}
+        </table>
 {% else %}
-    <h1>User List</h1>
+    <h1>Add a new user </h1>
     <br/>
+    <div class="shadow p-3 mb-5 bg-body-tertiary rounded">
     <form method="POST">
         {{ form.hidden_tag() }}
         {{ form.name.label (class="form-label") }}
@@ -24,12 +35,16 @@
         {{ form.submit(class="btn btn-secondary") }}
         
     </form>
+    </div>
 <br/> <br/> <br/>
+<table class="table table-striped table-hover table-bordered">
 {% for our_user in our_users %}
-{{our_user.id }}. {{ our_user.name 
-}} - {{ our_user.email }} <br/>
+<tr>
+   <td>{{our_user.id }}. {{ our_user.name 
+}} - {{ our_user.email }} </td>
+</tr>
 {% endfor %}
-
+</table>
 {% endif %}
 
 {% endblock %}
