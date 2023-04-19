@@ -79,5 +79,11 @@ def add_user():
         name = name,
         our_users=our_users)
 
+@app.route("/dashboard")
+def dashboard():
+    our_users = Users.query.order_by(Users.date_added)
+    return render_template("dashboard.html", our_users=our_users)
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=80)

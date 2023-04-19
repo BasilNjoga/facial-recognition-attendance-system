@@ -11,14 +11,6 @@
       </div>
     {% endfor %}
     <br/> <br/> <br/>
-    <table class="table table-striped table-hover table-bordered">
-        {% for our_user in our_users %}
-        <tr>
-           <td>{{our_user.id }}. {{ our_user.name 
-        }} - {{ our_user.email }} </td>
-        </tr>
-        {% endfor %}
-        </table>
 {% else %}
     <h1>Add a new user </h1>
     <br/>
@@ -37,14 +29,6 @@
     </form>
     </div>
 <br/> <br/> <br/>
-<table class="table table-striped table-hover table-bordered">
-{% for our_user in our_users %}
-<tr>
-   <td>{{our_user.id }}. {{ our_user.name 
-}} - {{ our_user.email }} </td>
-</tr>
-{% endfor %}
-</table>
 {% endif %}
 
 {% endblock %}
