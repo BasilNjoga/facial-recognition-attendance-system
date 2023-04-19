@@ -8,7 +8,7 @@ from datetime import datetime
 # Create a Flask Instance
 app = Flask(__name__)
 # Add Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/facialrecognition'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/facialrecognition'
 # Secret Key !
 app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
