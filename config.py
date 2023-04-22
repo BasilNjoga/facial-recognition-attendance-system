@@ -134,6 +134,32 @@ def add_attendance(name):
 def home():
     return render_template('index.html')
 
+#When you click the take attendance button
+@app.route("/start", methods=["GET"])
+def start():
+    if 'face_recognition_model.pkl' not in os.listdir('static'):
+        mess = "There are no registered users, please add a user to continue"
+        return render_template('index.html',mess=mess) 
+
+    cap = cv2.VideoCapture(0)
+    ret = True
+    while ret:
+        ret,frame = cap.read()
+        if extract_faces(frame)!=():
+            (x,y,w,h) = extract_faces(frame)[0]
+            cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
+            face = cv2.resize(frame[y:y+h,x:x+w], (50, 50))
+            identified_person = identify_face(face.reshape(1,-1))[0]
+            add_attendance(identified_person)
+            cv2.putText(frame,f'{identified_person}',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
+        cv2.imshow('Attendance',frame)
+        if cv2.waitKey(1)==27:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    names,rolls,times,l = extract_attendance()    
+    return render_template('index.html') 
+
 #Create name page
 @app.route("/name", methods=['GET', 'POST'])
 def name():
