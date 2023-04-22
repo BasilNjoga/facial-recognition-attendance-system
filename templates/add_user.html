@@ -12,22 +12,23 @@
     {% endfor %}
     <br/> <br/> <br/>
 {% else %}
-    <h1>Add a new user </h1>
-    <br/>
-    <div class="shadow p-3 mb-5 bg-body-tertiary rounded">
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        {{ form.name.label (class="form-label") }}
-        {{ form.name(class="form-control") }}
-        <br/>
-        {{ form.hidden_tag() }}
-        {{ form.email.label(class="form-label")}}
-        {{ form.email(class="form-control") }}
-        <br/>
-        {{ form.submit(class="btn btn-secondary") }}
-        
-    </form>
-    </div>
+<div>
+    <form action='/add_user' method="POST" enctype="multipart/form-data">
+        <h1>Add New User</h1>
+                <label class="form-label"> Enter New User's Name: </label>
+                <br>
+                <input type="text" id="newusername" name='newusername'  class="form-control" required>
+                <br>
+                <label class="form-label"> Enter New User's Id: </label>
+                <br>
+                <input type="number" id="newuserid" name='newuserid' class="form-control" required>
+                <br>
+                <button type='submit' class="btn btn-secondary"> Add New User
+                </button>
+            </form>
+        </br> </br>
+            <h2>Total Users in Database: {{totalreg}}</h2>
+</div>
 <br/> <br/> <br/>
 {% endif %}
 

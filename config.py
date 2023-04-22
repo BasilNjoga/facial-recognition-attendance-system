@@ -1,4 +1,5 @@
 from flask import Flask, render_template, flash
+from flask import request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired
@@ -44,12 +45,12 @@ class NamerForm(FlaskForm):
     submit = SubmitField("Log in")
 
 #Adding machine model functions 
-#### Saving Date today in 2 different formats
+#Saving Date today in 2 different formats
 datetoday = date.today().strftime("%m_%d_%y")
 datetoday2 = date.today().strftime("%d-%B-%Y")
 
 
-#### Initializing VideoCapture object to access WebCam
+#Initializing VideoCapture object to access WebCam
 face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 try:
     cap = cv2.VideoCapture(1)
@@ -57,7 +58,7 @@ except:
     cap = cv2.VideoCapture(0)
 
 
-#### If these directories don't exist, create them
+# If these directories don't exist, create them
 if not os.path.isdir('Attendance'):
     os.makedirs('Attendance')
 if not os.path.isdir('static'):
@@ -69,12 +70,12 @@ if f'Attendance-{datetoday}.csv' not in os.listdir('Attendance'):
         f.write('Name,Roll,Time')
 
 
-#### get a number of total registered users
+# get a number of total registered users
 def totalreg():
     return len(os.listdir('static/faces'))
 
 
-#### extract the face from an image
+# extract the face from an image
 def extract_faces(img):
     if img!=[]:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -83,13 +84,13 @@ def extract_faces(img):
     else:
         return []
 
-#### Identify face using ML model
+# Identify face using ML model
 def identify_face(facearray):
     model = joblib.load('static/face_recognition_model.pkl')
     return model.predict(facearray)
 
 
-#### A function which trains the model on all the faces available in faces folder
+# A function which trains the model on all the faces available in faces folder
 def train_model():
     faces = []
     labels = []
@@ -106,7 +107,7 @@ def train_model():
     joblib.dump(knn,'static/face_recognition_model.pkl')
 
 
-#### Extract info from today's attendance file in attendance folder
+# Extract info from today's attendance file in attendance folder
 def extract_attendance():
     df = pd.read_csv(f'Attendance/Attendance-{datetoday}.csv')
     names = df['Name']
@@ -116,7 +117,7 @@ def extract_attendance():
     return names,rolls,times,l
 
 
-#### Add Attendance of a specific user
+# Add Attendance of a specific user
 def add_attendance(name):
     username = name.split('_')[0]
     userid = name.split('_')[1]
@@ -149,25 +150,39 @@ def name():
         name = name,
         form = form)
 
-@app.route('/add_user', methods=['GET', 'POST'])
+@app.route("/add_user", methods=['GET', 'POST'])
 def add_user():
-    name = None
-    form = UserForm()
-    if form.validate_on_submit():
-        user = Users.query.filter_by(email=form.email.data).first()
-        if user is None:
-            user = Users(name=form.name.data, email=form.email.data)
-            db.session.add(user)
-            db.session.commit()
-        name = form.name.data
-        form.name.data = ''
-        form.email.data = ''
-        flash(" has been added")
-    our_users = Users.query.order_by(Users.date_added)
-    return render_template("add_user.html",
-        form = form,
-        name = name,
-        our_users=our_users)
+    if request.method == 'POST':
+        newusername = request.form['newusername']
+        newuserid = request.form['newuserid']
+        userimagefolder = 'static/faces/'+newusername+'_'+str(newuserid)
+        if not os.path.isdir(userimagefolder):
+            os.makedirs(userimagefolder)
+        cap = cv2.VideoCapture(0)
+        i,j = 0,0
+        while 1:
+            _,frame = cap.read()
+            faces = extract_faces(frame)
+            for (x,y,w,h) in faces:
+                cv2.rectangle(frame,(x, y), (x+w, y+h), (255, 0, 20), 2)
+                cv2.putText(frame,f'Images Captured: {i}/50',(30,30),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 20),2,cv2.LINE_AA)
+                if j%10==0:
+                    name = newusername+'_'+str(i)+'.jpg'
+                    cv2.imwrite(userimagefolder+'/'+name,frame[y:y+h,x:x+w])
+                    i+=1
+                j+=1
+            if j==500:
+                break
+            cv2.imshow('Adding new User',frame)
+            if cv2.waitKey(1)==27:
+                break
+        cap.release()
+        cv2.destroyAllWindows()
+        print('Training Model')
+        train_model()
+        names,rolls,times,l = extract_attendance()
+        
+    return render_template("add_user.html",totalreg=totalreg())
 
 @app.route("/dashboard")
 def dashboard():
