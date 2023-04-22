@@ -158,7 +158,7 @@ def start():
     cap.release()
     cv2.destroyAllWindows()
     names,rolls,times,l = extract_attendance()    
-    return render_template('index.html') 
+    return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
 
 #Create name page
 @app.route("/name", methods=['GET', 'POST'])
@@ -212,8 +212,8 @@ def add_user():
 
 @app.route("/dashboard")
 def dashboard():
-    our_users = Users.query.order_by(Users.date_added)
-    return render_template("dashboard.html", our_users=our_users)
+    names,rolls,times,l = extract_attendance()
+    return render_template("dashboard.html",names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
 
 
 if __name__ == "__main__":

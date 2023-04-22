@@ -5,9 +5,8 @@
 {% endblock %}
 
 {% block content %}
-<h1>Facial Recognition System </h1>
+<h1 id="heading">Facial Recognition Based Attendance System </h1>
 </br>
-<h1>Display Webcam Stream</h1>
 
 {% if mess%}
 <p class="text-center" style="color: red;font-size: 20px;">{{ mess }}</p>
@@ -21,12 +20,14 @@
            Take Attendance 
           </button>
       </a>
-      <table style="background-color: white;">
+    </br> </br>
+    <h1> Recorded Attendance for {{ datetoday2 }} </h1>
+      <table class="table table-dark table-striped table-hover table-bordered">
             <tr>
-                <td><b>S No</b></td>
-                <td><b>Name</b></td>
-                <td><b>ID</b></td>
-                <td><b>Time</b></td>
+                <td> Number</td>
+                <td> Name </td>
+                <td> ID </td>
+                <td> Time </td>
             </tr>
             {% if l %}
 

@@ -1,12 +1,17 @@
 body {
     padding: 0px;
+	background-color: #333c44;
+	color: white;
+}
+#mynav {
+	background-color: #333c44;
 }
 #content {
 	padding: 30px;
 }
 h1 {
     font-family: sans-serif;
-    color: #333;
+    color: whitesmoke;
 }
 #container {
 	margin: 0px auto;

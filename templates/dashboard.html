@@ -3,12 +3,23 @@
 {% block content %}
 <h1> Hello This is your friendly dashboard </h1>
 </br> </br>
-    <table class="table table-striped table-hover table-bordered">
-        {% for our_user in our_users %}
-        <tr>
-           <td>{{our_user.id }}. {{ our_user.name 
-        }} - {{ our_user.email }} </td>
-        </tr>
-        {% endfor %}
-        </table>
+<table class="table table-striped table-hover table-bordered">
+    <tr>
+        <td> Number</td>
+        <td> Name </td>
+        <td> ID </td>
+        <td> Time </td>
+    </tr>
+    {% if l %}
+
+    {% for i in range(l) %}
+    <tr>
+        <td>{{ i+1 }}</td>
+        <td>{{ names[i] }}</td>
+        <td>{{ rolls[i] }}</td>
+        <td>{{ times[i] }}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+</table>
 {% endblock %}
