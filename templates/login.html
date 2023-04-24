@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
-{% block mycss %} 
+{% block mycss %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css')}}">
 {% endblock %}
+
 {% block content %}
 
 {% for message in get_flashed_messages() %}
@@ -13,10 +14,10 @@
  {% endfor %}
 
 {% if email %}
-    <h1> Email: {{ email }} </h1>
-    <h1>Password: {{ password }} </h1>
+    <h1> Email: {{ email }} !! </h1>
+    <h1> Password: {{ password_hash }} </h1>
 {% else %}
-    <h1 class="heading">Please login up to Continue </h1>
+    <h1 class="heading">Please Log in to Continue </h1>
     <br/>
     <form method="POST">
         {{ form.hidden_tag() }}
@@ -31,8 +32,8 @@
         {{ form.submit(class="btn btn-secondary") }}
         
     </form>
-</br>
-    <a href="/name">New User ? Signup here </a>
+    <a href="/name"> Don't have an account ? Register here </a>
+
 {% endif %}
 
 {% endblock %}

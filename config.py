@@ -52,12 +52,15 @@ class NamerForm(FlaskForm):
     email = StringField("Email:", validators=[DataRequired()])
     password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
+    submit = SubmitField("Sign up")
+
+
+# Create a Form Class
+class PasswordForm(FlaskForm):
+    email = StringField("Email:", validators=[DataRequired()])
+    password_hash = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField("Log in")
 
-class PasswordForm(FlaskForm):
-    email = StringField("What's Your Email:", validators=[DataRequired()])
-    password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match')])
-    submit = SubmitField("Log in")
 
 #Adding machine model functions 
 #Saving Date today in 2 different formats
@@ -201,29 +204,6 @@ def name():
         form = form,
         our_users = our_users)
 
-# Create a login page
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    email = None
-    password = None
-    pw_to_check = None
-    passed = None
-    form = PasswordForm()
-
-    # Validate Form
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password_hash.data
-
-        form.email.data = ''
-        form.password_hash.data = ''
-        flash("Login Successful")
-    
-    return render_template("login.html", 
-        email=email,
-        password=password,
-        form = form)
-
 
 @app.route("/add_user", methods=['GET', 'POST'])
 def add_user():
@@ -263,6 +243,26 @@ def add_user():
 def dashboard():
     names,rolls,times,l = extract_attendance()
     return render_template("dashboard.html",names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
+
+#Create login page
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    email = None
+    password_hash = None
+    form = PasswordForm()
+    #Validate Form
+    if form.validate_on_submit():
+        email = form.email.data
+        password_hash = form.password_hash.data
+
+        #Clearing the form
+        form.email.data = ''
+        form.password_hash.data = ''
+        flash("Login Successful")
+    return render_template('login.html',
+        email = email,
+        password_hash=password_hash,
+        form = form)
 
 
 if __name__ == "__main__":
