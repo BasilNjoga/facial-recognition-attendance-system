@@ -6,6 +6,6 @@ Backend: Python, Flask </br>
 Machine Learning: Numpy, Pandas, scikitlearn - KNeighbours Classifier </br>
 
 # How to run app
-Download repository : Git clone{{repo link}}
+Download repository : Git clone{{repo link}} </br>
 Start Flask app : Python Config.py
 
