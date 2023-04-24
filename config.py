@@ -47,16 +47,16 @@ class Users(db.Model):
         return '<Name %r>' % self.name
 
 # Create a Form Class
-class UserForm(FlaskForm):
-    name = StringField("Name:", validators=[DataRequired()])
-    email = StringField("Email:", validators=[DataRequired()])
-    
-    submit = SubmitField("Add User")
 class NamerForm(FlaskForm):
     name = StringField("Name:", validators=[DataRequired()])
     email = StringField("Email:", validators=[DataRequired()])
     password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
+    submit = SubmitField("Log in")
+
+class PasswordForm(FlaskForm):
+    email = StringField("What's Your Email:", validators=[DataRequired()])
+    password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match')])
     submit = SubmitField("Log in")
 
 #Adding machine model functions 
@@ -185,18 +185,45 @@ def name():
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if user is None:
-            user = Users(name=form.name.data, email=form.email.data)
-            db.sesion.add(user)
+            # Hash the password!!!
+            hashed_pw = generate_password_hash(form.password_hash.data, "sha256")
+            user = Users(name=form.name.data, email=form.email.data, password_hash=hashed_pw)
+            db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
         form.email.data = ''
+        form.password_hash = ''
         flash("Form Submitted Successfuly")
     our_users = Users.query.order_by(Users.date_added)
     return render_template('name.html',
         name = name,
         form = form,
         our_users = our_users)
+
+# Create a login page
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    email = None
+    password = None
+    pw_to_check = None
+    passed = None
+    form = PasswordForm()
+
+    # Validate Form
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password_hash.data
+
+        form.email.data = ''
+        form.password_hash.data = ''
+        flash("Login Successful")
+    
+    return render_template("login.html", 
+        email=email,
+        password=password,
+        form = form)
+
 
 @app.route("/add_user", methods=['GET', 'POST'])
 def add_user():

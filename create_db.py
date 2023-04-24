@@ -12,3 +12,11 @@ my_cursor.execute("SHOW DATABASES")
 
 for db in my_cursor:
     print(db)
+
+"""
+The following is code for creating tables from the model used;
+
+from project_name import app, db
+app.app_context().push()
+db.create_all()
+"""
