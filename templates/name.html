@@ -23,7 +23,12 @@
         {{ form.name.label (class="form-label") }}
         {{ form.name(class="form-control") }}
         <br/>
-        {{ form.hidden_tag() }}
+
+        {{ form.username.label (class="form-label") }}
+        {{ form.username(class="form-control") }}
+        <br/>
+
+
         {{ form.email.label(class="form-label")}}
         {{ form.email(class="form-control") }}
         <br/>
@@ -46,7 +51,7 @@
         {% for our_user in our_users %}
     <tr>
         <td>{{our_user.id }}. {{ our_user.name 
-        }} - {{ our_user.email }} </td>
+        }} - {{our_user.username }} - {{ our_user.email }} </td>
     </tr>
         {% endfor %}
     </table>

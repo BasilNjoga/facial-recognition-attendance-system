@@ -1,25 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1> Hello This is your friendly dashboard </h1>
-</br> </br>
-<table class="table table-striped table-hover table-bordered">
-    <tr>
-        <td> Number</td>
-        <td> Name </td>
-        <td> ID </td>
-        <td> Time </td>
-    </tr>
-    {% if l %}
 
-    {% for i in range(l) %}
-    <tr>
-        <td>{{ i+1 }}</td>
-        <td>{{ names[i] }}</td>
-        <td>{{ rolls[i] }}</td>
-        <td>{{ times[i] }}</td>
-    </tr>
-    {% endfor %}
-    {% endif %}
-</table>
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+   
+{% endfor %}
+
+<h1>Dashboard</h1>
+<br/> <br/>
+<h1> You are logged in </h1>
+
+
+<a href="{{url_for('logout')}}">Logout</a>
 {% endblock %}

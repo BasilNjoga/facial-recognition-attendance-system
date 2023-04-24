@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, redirect, url_for
 from flask import request
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, BooleanField, ValidationError
@@ -12,6 +12,8 @@ import joblib
 import cv2
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
+
 
 # Create a Flask Instance
 app = Flask(__name__)
@@ -22,9 +24,19 @@ app.config['SECRET_KEY'] = "my super secret key only i know"
 # Initialize The Database
 db = SQLAlchemy(app)
 
+#Flask_Login Resources
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
 #Create Model
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), nullable=False, unique=True)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
@@ -49,6 +61,7 @@ class Users(db.Model):
 # Create a Form Class
 class NamerForm(FlaskForm):
     name = StringField("Name:", validators=[DataRequired()])
+    username = StringField("Username:", validators=[DataRequired()])
     email = StringField("Email:", validators=[DataRequired()])
     password_hash = PasswordField('Password', validators=[DataRequired(), EqualTo('password_hash2', message='Passwords Must Match')])
     password_hash2 = PasswordField('Confirm Password', validators=[DataRequired()])
@@ -57,12 +70,12 @@ class NamerForm(FlaskForm):
 
 # Create a Form Class
 class PasswordForm(FlaskForm):
-    email = StringField("Email:", validators=[DataRequired()])
-    password_hash = PasswordField('Password', validators=[DataRequired()])
+    username = StringField("Username:", validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField("Log in")
 
 
-#Adding machine model functions 
+###Adding machine model functions 
 #Saving Date today in 2 different formats
 datetoday = date.today().strftime("%m_%d_%y")
 datetoday2 = date.today().strftime("%d-%B-%Y")
@@ -146,9 +159,11 @@ def add_attendance(name):
         with open(f'Attendance/Attendance-{datetoday}.csv','a') as f:
             f.write(f'\n{username},{userid},{current_time}')
 
-
+### Routing Functions 
 #Create home page
 @app.route("/")
+#Login is required to access important sections
+@login_required
 def home():
     return render_template('index.html')
 
@@ -178,7 +193,7 @@ def start():
     names,rolls,times,l = extract_attendance()    
     return render_template('index.html',names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2) 
 
-#Create name page
+#Create user signup page
 @app.route("/name", methods=['GET', 'POST'])
 def name():
     name = None
@@ -190,11 +205,12 @@ def name():
         if user is None:
             # Hash the password!!!
             hashed_pw = generate_password_hash(form.password_hash.data, "sha256")
-            user = Users(name=form.name.data, email=form.email.data, password_hash=hashed_pw)
+            user = Users(username=form.username.data, name=form.name.data, email=form.email.data, password_hash=hashed_pw)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
+        form.username.data = ''
         form.email.data = ''
         form.password_hash = ''
         flash("Form Submitted Successfuly")
@@ -204,8 +220,9 @@ def name():
         form = form,
         our_users = our_users)
 
-
+#Add user route, upon clicking link the function below runs
 @app.route("/add_user", methods=['GET', 'POST'])
+@login_required
 def add_user():
     if request.method == 'POST':
         newusername = request.form['newusername']
@@ -240,28 +257,37 @@ def add_user():
     return render_template("add_user.html",totalreg=totalreg())
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    names,rolls,times,l = extract_attendance()
-    return render_template("dashboard.html",names=names,rolls=rolls,times=times,l=l,totalreg=totalreg(),datetoday2=datetoday2)
+    return render_template("dashboard.html")
+
+#Create logout function
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    flash("You Have Been Logged Out! Thanks For stopping by")
+    return redirect(url_for('login'))
 
 #Create login page
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    email = None
-    password_hash = None
     form = PasswordForm()
     #Validate Form
     if form.validate_on_submit():
-        email = form.email.data
-        password_hash = form.password_hash.data
+        user = Users.query.filter_by(username=form.username.data).first()
+        if user:
+            #check the hash
+            if check_password_hash(user.password_hash, form.password.data):
+                login_user(user)
+                flash("Login Successfull!!")
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Wrong Password - Try Again!")
+        else:
+            flash("That User Doesn't exist! Try Again!")
 
-        #Clearing the form
-        form.email.data = ''
-        form.password_hash.data = ''
-        flash("Login Successful")
     return render_template('login.html',
-        email = email,
-        password_hash=password_hash,
         form = form)
 
 
