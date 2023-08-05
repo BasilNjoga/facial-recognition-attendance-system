@@ -1,5 +1,5 @@
 # facial-recognition-attendance-system
-This is a repository for my full stack facial recognition attendance system application
+A web application that uses facial recognition to mark class attendance
 # Technology used
 Frontend : HTML , CSS, Javascript </br>
 Backend: Python, Flask </br>
