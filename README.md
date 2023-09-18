@@ -49,5 +49,5 @@ cd ..
 **Start your server locally**
 
 ```
-python config.py
+python app.py
 ```
